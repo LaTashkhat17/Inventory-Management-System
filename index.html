@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS System - Business Management</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h1>POS System</h1>
+            <h2>Business Management System</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <div style="margin-top: 1rem; text-align: center; color: #64748b; font-size: 0.875rem;">
+                    Default: admin / admin123
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="app-container" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>POS System</h2>
+                <p id="userRoleDisplay"></p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" onclick="showModule('dashboard')" class="nav-link active">Dashboard</a></li>
+                <li><a href="#" onclick="showModule('suppliers')" class="nav-link">Suppliers</a></li>
+                <li><a href="#" onclick="showModule('customers')" class="nav-link">Customers</a></li>
+                <li><a href="#" onclick="showModule('items')" class="nav-link">Items</a></li>
+                <li><a href="#" onclick="showModule('purchases')" class="nav-link">Purchases</a></li>
+                <li><a href="#" onclick="showModule('sales')" class="nav-link">Sales</a></li>
+                <li><a href="#" onclick="showModule('cashflow')" class="nav-link">Cash Flow</a></li>
+                <li><a href="#" onclick="showModule('reports')" class="nav-link">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Module -->
+            <div id="dashboard" class="module">
+                <h1>Dashboard</h1>
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h3>Total Sales</h3>
+                        <p id="totalSales">Tk 0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Purchases</h3>
+                        <p id="totalPurchases">Tk 0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Cash Flow</h3>
+                        <p id="netCashFlow">Tk 0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Items</h3>
+                        <p id="totalItems">0</p>
+                    </div>
+                </div>
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3>Sales Overview</h3>
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Purchase Overview</h3>
+                        <canvas id="purchaseChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Cash Flow Trend</h3>
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suppliers Module -->
+            <div id="suppliers" class="module" style="display: none;">
+                <div class="module-header">
+                    <h1>Supplier Management</h1>
+                    <button onclick="openSupplierModal()" class="btn-primary">Add Supplier</button>
+                </div>
+                <div class="table-container">
+                    <table id="suppliersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Customers Module -->
+            <div id="customers" class="module" style="display: none;">
+                <div class="module-header">
+                    <h1>Customer Management</h1>
+                    <button onclick="openCustomerModal()" class="btn-primary">Add Customer</button>
+                </div>
+                <div class="table-container">
+                    <table id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Items Module -->
+            <div id="items" class="module" style="display: none;">
+                <div class="module-header">
+                    <h1>Item Management</h1>
+                    <button onclick="openItemModal()" class="btn-primary">Add Item</button>
+                </div>
+                <div class="table-container">
+                    <table id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Unit</th>
+                                <th>Current Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Purchases Module -->
+            <div id="purchases" class="module" style="display: none;">
+                <div class="module-header">
+                    <h1>Purchase Management</h1>
+                    <button onclick="openPurchaseModal()" class="btn-primary">New Purchase</button>
+                </div>
+                <div class="table-container">
+                    <table id="purchasesTable">
+                        <thead>
+                            <tr>
+                                <th>Purchase No</th>
+                                <th>Date</th>
+                                <th>Supplier</th>
+                                <th>Total Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchasesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sales Module -->
+            <div id="sales" class="module" style="display: none;">
+                <div class="module-header">
+                    <h1>Sales Management</h1>
+                    <button onclick="openSalesModal()" class="btn-primary">New Sale</button>
+                </div>
+                <div class="table-container">
+                    <table id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Sales No</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Total Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cash Flow Module -->
+            <div id="cashflow" class="module" style="display: none;">
+                <div class="module-header">
+                    <h1>Cash Flow Management</h1>
+                    <button onclick="openCashFlowModal()" class="btn-primary">Add Transaction</button>
+                </div>
+                <div class="table-container">
+                    <table id="cashFlowTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cashFlowTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reports Module -->
+            <div id="reports" class="module" style="display: none;">
+                <h1>Reports</h1>
+                <div class="reports-section">
+                    <h2>Inventory Ledger</h2>
+                    <div class="filter-group">
+                        <label>Select Item:</label>
+                        <select id="reportItemSelect" onchange="generateInventoryReport()">
+                            <option value="">All Items</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table id="inventoryReportTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Item ID</th>
+                                    <th>Movement</th>
+                                    <th>Quantity</th>
+                                    <th>Reference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryReportTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Supplier Modal -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSupplierModal()">&times;</span>
+            <h2 id="supplierModalTitle">Add Supplier</h2>
+            <form id="supplierForm">
+                <input type="hidden" id="supplierId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="supplierName" required>
+                </div>
+                <div class="form-group">
+                    <label>Contact</label>
+                    <input type="text" id="supplierContact">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="supplierEmail">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="supplierAddress"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="supplierStatus" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCustomerModal()">&times;</span>
+            <h2 id="customerModalTitle">Add Customer</h2>
+            <form id="customerForm">
+                <input type="hidden" id="customerId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Contact</label>
+                    <input type="text" id="customerContact">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="customerEmail">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="customerAddress"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="customerStatus" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Item Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeItemModal()">&times;</span>
+            <h2 id="itemModalTitle">Add Item</h2>
+            <form id="itemForm">
+                <input type="hidden" id="itemId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="itemName" required>
+                </div>
+                <div class="form-group">
+                    <label>Unit of Measure</label>
+                    <input type="text" id="itemUnit" placeholder="e.g., kg, pcs, liter" required>
+                </div>
+                <div class="form-group">
+                    <label>Initial Stock</label>
+                    <input type="number" id="itemStock" value="0" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closePurchaseModal()">&times;</span>
+            <h2 id="purchaseModalTitle">New Purchase</h2>
+            <form id="purchaseForm">
+                <input type="hidden" id="purchaseId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Purchase Date</label>
+                        <input type="date" id="purchaseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Supplier</label>
+                        <select id="purchaseSupplier" required></select>
+                    </div>
+                </div>
+                <h3>Purchase Items</h3>
+                <div id="purchaseItemsList"></div>
+                <button type="button" onclick="addPurchaseItem()" class="btn-secondary">Add Item</button>
+                <div class="purchase-summary">
+                    <h3>Total Amount: TK<span id="purchaseTotal">0</span></h3>
+                </div>
+                <button type="submit" class="btn-primary">Save Purchase</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sales Modal -->
+    <div id="salesModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeSalesModal()">&times;</span>
+            <h2 id="salesModalTitle">New Sale</h2>
+            <form id="salesForm">
+                <input type="hidden" id="salesId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sales Date</label>
+                        <input type="date" id="salesDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Customer</label>
+                        <select id="salesCustomer" required></select>
+                    </div>
+                </div>
+                <h3>Sales Items</h3>
+                <div id="salesItemsList"></div>
+                <button type="button" onclick="addSalesItem()" class="btn-secondary">Add Item</button>
+                <div class="sales-summary">
+                    <h3>Total Amount: TK<span id="salesTotal">0</span></h3>
+                </div>
+                <button type="submit" class="btn-primary">Save Sale</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cash Flow Modal -->
+    <div id="cashFlowModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCashFlowModal()">&times;</span>
+            <h2 id="cashFlowModalTitle">Add Transaction</h2>
+            <form id="cashFlowForm">
+                <input type="hidden" id="cashFlowId">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="cashFlowDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="cashFlowType" required>
+                        <option value="IN">Inflow</option>
+                        <option value="OUT">Outflow</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number" id="cashFlowAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="cashFlowDescription" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+</html>
+
